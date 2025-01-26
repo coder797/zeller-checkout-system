@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "ts-node --files src/tests/checkout.test.ts --no-silent -- --test-console=output --test-reporter=spec"
+    "test": "ts-node --files -r tsconfig-paths/register src/tests/checkout.test.ts"
   },
   "author": "",
   "license": "ISC",
@@ -11,6 +11,7 @@
   "devDependencies": {
     "@types/node": "^22.10.10",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3"
   }
 }
