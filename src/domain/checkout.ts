@@ -48,9 +48,9 @@ export class Checkout {
 
         for (const rule of rules) {
             const result = rule.apply(
-                quantity, // Original quantity stays constant
-                effectiveQty, // Current effective quantity
-                effectivePrice // Current effective price
+                quantity,
+                effectiveQty,
+                effectivePrice
             );
             effectiveQty = result.quantity;
             effectivePrice = result.price;
@@ -70,7 +70,6 @@ export class Checkout {
             totalPrice += skuTotal;
         }
 
-        // Use integer arithmetic for currency to avoid floating point issues
         return Math.round(totalPrice * 100) / 100;
     }
 }
