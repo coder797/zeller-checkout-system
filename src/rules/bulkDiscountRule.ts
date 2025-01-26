@@ -22,7 +22,7 @@ export class BulkDiscountRule implements PricingRule {
         return this.sku;
     }
 
-    apply(quantity: number, unitPrice: number, currentTotal: number): number {
+    apply(quantity: number, currentTotal: number): number {
         if (quantity >= this.threshold) {
             return quantity * this.discountedPrice;
         }
@@ -32,7 +32,7 @@ export class BulkDiscountRule implements PricingRule {
     getThreshold(): number {
         return this.threshold;
     }
-    
+
     getDiscountedPrice(): number {
         return this.discountedPrice;
     }

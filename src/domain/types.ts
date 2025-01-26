@@ -1,5 +1,3 @@
-import {Cart} from "./cart";
-import {Catalog} from "./catalog";
 
 export interface PricingRule {
     getSku(): string;
