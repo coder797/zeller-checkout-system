@@ -26,6 +26,9 @@ export class BulkDiscountRule implements PricingRule {
         this.threshold = threshold;
         this.discountedPrice = discountedPrice;
     }
+    getSku(): string {
+        return this.sku;
+    }
 
     apply(cart: Cart, catalog: Catalog): number {
         const quantity = cart.getItemCount(this.sku);
