@@ -1,6 +1,6 @@
-import {PricingRule} from "../domain/types";
-import {Cart} from "../domain/cart";
-import {Catalog} from "../domain/catalog";
+import {PricingRule} from "@/domain/types";
+import {Cart} from "@/domain/cart";
+import {Catalog} from "@/domain/catalog";
 
 export class BuyXPayYRule implements PricingRule {
     constructor(
