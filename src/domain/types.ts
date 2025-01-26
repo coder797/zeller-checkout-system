@@ -3,6 +3,7 @@ import {Catalog} from "./catalog";
 
 export interface PricingRule {
     apply(cart: Cart, catalog: Catalog): number;
+    getSku(): string;
 }
 
 export interface Product {
