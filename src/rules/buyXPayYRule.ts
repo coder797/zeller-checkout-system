@@ -1,22 +1,32 @@
-import {PricingRule} from "@/domain/types";
+// BuyXPayYRule.ts
+import { PricingRule } from "@/domain/types";
 
 export class BuyXPayYRule implements PricingRule {
+    public readonly sku: string;
+    public readonly priority: number;
+
     constructor(
-        private readonly sku: string,
+        sku: string,
         private readonly buyX: number,
-        private readonly payY: number
-    ) {}
-
-    getSku(): string {
-        return this.sku;
+        private readonly payY: number,
+        priority?: number
+    ) {
+        this.sku = sku;
+        this.priority = priority ?? 2; // Default lower priority than bulk discounts
     }
 
-    apply(quantity: number, unitPrice: number): number {
-        const sets = Math.floor(quantity / this.buyX);
-        const remainder = quantity % this.buyX;
-        return (sets * this.payY + remainder) * unitPrice;
+    apply(
+        originalQuantity: number,
+        currentQuantity: number,
+        currentPrice: number
+    ) {
+        const sets = Math.floor(currentQuantity / this.buyX);
+        const remainder = currentQuantity % this.buyX;
+        const newQuantity = sets * this.payY + remainder;
+        return { quantity: newQuantity, price: currentPrice };
     }
 
+    // Optional getters if needed
     getBuyX(): number {
         return this.buyX;
     }

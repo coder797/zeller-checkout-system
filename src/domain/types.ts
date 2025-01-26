@@ -1,9 +1,14 @@
 
+// types.ts
 export interface PricingRule {
-    getSku(): string;
-    apply(quantity: number, unitPrice: number, currentTotal: number): number;
+    readonly sku: string;
+    readonly priority: number;
+    apply(
+        originalQuantity: number,
+        currentQuantity: number,
+        currentPrice: number
+    ): { quantity: number; price: number };
 }
-
 export interface Product {
     sku: string;
     name: string;

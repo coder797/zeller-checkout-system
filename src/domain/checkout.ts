@@ -1,82 +1,76 @@
-import { Cart } from './cart'
-import { Catalog } from './catalog'
-import { PricingRule } from './types'
-import { BulkDiscountRule } from '@/rules/bulkDiscountRule'
-import { BuyXPayYRule } from '@/rules/buyXPayYRule'
+// Checkout.ts
+
+import { PricingRule } from './types';
+import {Cart} from "@/domain/cart";
+import {Catalog} from "@/domain/catalog";
 
 export class Checkout {
-    private readonly cart: Cart
-    private readonly catalog: Catalog
-    private readonly rulesBySku: Map<string, PricingRule[]>
+    private readonly cart: Cart;
+    private readonly catalog: Catalog;
+    private readonly rulesBySku: Map<string, PricingRule[]>;
 
     constructor(pricingRules: PricingRule[]) {
-        this.cart = new Cart()
-        this.catalog = new Catalog()
-        this.rulesBySku = this.initializeRulesBySku(pricingRules)
+        this.cart = new Cart();
+        this.catalog = new Catalog();
+        this.rulesBySku = this.initializeRulesBySku(pricingRules);
     }
 
     private initializeRulesBySku(rules: PricingRule[]): Map<string, PricingRule[]> {
-        const rulesBySku = new Map<string, PricingRule[]>()
+        const rulesBySku = new Map<string, PricingRule[]>();
+
+        // Group rules by SKU
         for (const rule of rules) {
-            const sku = rule.getSku()
-            if (!rulesBySku.has(sku)) {
-                rulesBySku.set(sku, [])
-            }
-            rulesBySku.get(sku)?.push(rule)
+            const skuRules = rulesBySku.get(rule.sku) || [];
+            skuRules.push(rule);
+            rulesBySku.set(rule.sku, skuRules);
         }
-        return rulesBySku
+
+        // Sort rules by priority for each SKU
+        for (const [sku, skuRules] of rulesBySku) {
+            skuRules.sort((a, b) => a.priority - b.priority);
+        }
+
+        return rulesBySku;
     }
 
     scan(sku: string): void {
-        const product = this.catalog.getProduct(sku)
+        const product = this.catalog.getProduct(sku);
         if (!product) {
-            throw new Error(`SKU ${sku} does not exist in the catalog`)
+            throw new Error(`SKU ${sku} does not exist in the catalog`);
         }
-        this.cart.addItem(sku)
+        this.cart.addItem(sku);
     }
 
     private applyPricingRules(sku: string, quantity: number, basePrice: number): number {
-        const rules = this.rulesBySku.get(sku) || []
-        if (rules.length === 0) return quantity * basePrice
+        const rules = this.rulesBySku.get(sku) || [];
+        let effectiveQty = quantity;
+        let effectivePrice = basePrice;
 
-        // Sort rules by type - apply BuyXPayY first, then BulkDiscount
-        const sortedRules = [...rules].sort((a, b) => {
-            if (a instanceof BuyXPayYRule && b instanceof BulkDiscountRule) return -1;
-            if (a instanceof BulkDiscountRule && b instanceof BuyXPayYRule) return 1;
-            return 0;
-        });
-
-        // First calculate effective quantity after BuyXPayY rules
-        let effectiveQuantity = quantity;
-        let effectiveUnitPrice = basePrice;
-
-        for (const rule of sortedRules) {
-            if (rule instanceof BuyXPayYRule) {
-                const buyX = (rule as BuyXPayYRule).getBuyX();
-                const payY = (rule as BuyXPayYRule).getPayY();
-                const sets = Math.floor(effectiveQuantity / buyX);
-                effectiveQuantity = (sets * payY) + (effectiveQuantity % buyX);
-            } else if (rule instanceof BulkDiscountRule) {
-                if (quantity >= (rule as BulkDiscountRule).getThreshold()) {
-                    effectiveUnitPrice = (rule as BulkDiscountRule).getDiscountedPrice();
-                }
-            }
+        for (const rule of rules) {
+            const result = rule.apply(
+                quantity, // Original quantity stays constant
+                effectiveQty, // Current effective quantity
+                effectivePrice // Current effective price
+            );
+            effectiveQty = result.quantity;
+            effectivePrice = result.price;
         }
 
-        return effectiveQuantity * effectiveUnitPrice;
+        return effectiveQty * effectivePrice;
     }
 
     total(): number {
-        let totalPrice = 0
+        let totalPrice = 0;
 
         for (const [sku, quantity] of this.cart.getItems().entries()) {
-            const product = this.catalog.getProduct(sku)
-            if (!product) continue
+            const product = this.catalog.getProduct(sku);
+            if (!product) continue;
 
-            const skuTotal = this.applyPricingRules(sku, quantity, product.price)
-            totalPrice += skuTotal
+            const skuTotal = this.applyPricingRules(sku, quantity, product.price);
+            totalPrice += skuTotal;
         }
 
-        return Math.round(totalPrice * 100) / 100
+        // Use integer arithmetic for currency to avoid floating point issues
+        return Math.round(totalPrice * 100) / 100;
     }
 }

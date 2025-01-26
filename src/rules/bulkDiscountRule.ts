@@ -1,32 +1,32 @@
-import {PricingRule} from "@/domain/types";
+// BulkDiscountRule.ts
+import { PricingRule } from "@/domain/types";
 
-
-/**
- * If quantity >= threshold, each unit's price is discounted to a specified lower price.
- *
- * Example usage:
- *   new BulkDiscountRule('ipd', 4, 499.99)
- *   => If the cart has 4+ "ipd", each "ipd" is effectively 499.99 (instead of, say, 549.99).
- *   => The discount is (originalPrice - discountedPrice) * quantity
- */
 export class BulkDiscountRule implements PricingRule {
+    public readonly sku: string;
+    public readonly priority: number;
+
     constructor(
-        private readonly sku: string,
+        sku: string,
         private readonly threshold: number,
-        private readonly discountedPrice: number
-    ) {}
-
-    getSku(): string {
-        return this.sku;
+        private readonly discountedPrice: number,
+        priority?: number
+    ) {
+        this.sku = sku;
+        this.priority = priority ?? 1; // Default higher priority
     }
 
-    apply(quantity: number, currentTotal: number): number {
-        if (quantity >= this.threshold) {
-            return quantity * this.discountedPrice;
-        }
-        return currentTotal;
+    apply(
+        originalQuantity: number,
+        currentQuantity: number,
+        currentPrice: number
+    ) {
+        const newPrice = originalQuantity >= this.threshold
+            ? this.discountedPrice
+            : currentPrice;
+        return { quantity: currentQuantity, price: newPrice };
     }
 
+    // Optional getters if needed
     getThreshold(): number {
         return this.threshold;
     }
