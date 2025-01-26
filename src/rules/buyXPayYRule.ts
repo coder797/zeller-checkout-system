@@ -16,7 +16,7 @@ export class BuyXPayYRule implements PricingRule {
     }
 
     apply(
-        originalQuantity: number,
+        _originalQuantity: number,
         currentQuantity: number,
         currentPrice: number
     ) {

@@ -26,7 +26,7 @@ export class Checkout {
         }
 
         // Sort rules by priority for each SKU
-        for (const [sku, skuRules] of rulesBySku) {
+        for (const [, skuRules] of rulesBySku) {
             skuRules.sort((a, b) => a.priority - b.priority);
         }
 
