@@ -7,13 +7,11 @@ import { BuyXPayYRule } from '@/rules/buyXPayYRule'
 export class Checkout {
     private readonly cart: Cart
     private readonly catalog: Catalog
-    private readonly pricingRules: PricingRule[]
     private readonly rulesBySku: Map<string, PricingRule[]>
 
     constructor(pricingRules: PricingRule[]) {
         this.cart = new Cart()
         this.catalog = new Catalog()
-        this.pricingRules = pricingRules
         this.rulesBySku = this.initializeRulesBySku(pricingRules)
     }
 
