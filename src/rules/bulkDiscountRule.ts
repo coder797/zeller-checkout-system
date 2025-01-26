@@ -1,5 +1,3 @@
-import { Cart } from '@/domain/cart';
-import { Catalog } from '@/domain/catalog';
 import {PricingRule} from "@/domain/types";
 
 
