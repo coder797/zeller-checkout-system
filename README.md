@@ -45,7 +45,7 @@ The system supports two types of pricing rules:
   ```bash
   git clone https://github.com/coder797/zeller-checkout-system
   ```
-3. Install the Dev dependencies:
+2. Install the Dev dependencies:
   ```bash
   npm install
   ```
