@@ -12,34 +12,28 @@ import {PricingRule} from "@/domain/types";
  *   => The discount is (originalPrice - discountedPrice) * quantity
  */
 export class BulkDiscountRule implements PricingRule {
-    private readonly sku: string;
-    private readonly threshold: number;
-    private readonly discountedPrice: number;
-
-
     constructor(
-        sku: string,
-        threshold: number,
-        discountedPrice: number
-    ) {
-        this.sku = sku;
-        this.threshold = threshold;
-        this.discountedPrice = discountedPrice;
-    }
+        private readonly sku: string,
+        private readonly threshold: number,
+        private readonly discountedPrice: number
+    ) {}
+
     getSku(): string {
         return this.sku;
     }
 
-    apply(cart: Cart, catalog: Catalog): number {
-        const quantity = cart.getItemCount(this.sku);
-        if (quantity < this.threshold) return 0;
-
-        const product = catalog.getProduct(this.sku);
-        if (!product) return 0;
-
-        const originalPrice = product.price;
-        const discountPerUnit = originalPrice - this.discountedPrice;
-        return discountPerUnit * quantity;
+    apply(quantity: number, unitPrice: number, currentTotal: number): number {
+        if (quantity >= this.threshold) {
+            return quantity * this.discountedPrice;
+        }
+        return currentTotal;
     }
 
+    getThreshold(): number {
+        return this.threshold;
+    }
+    
+    getDiscountedPrice(): number {
+        return this.discountedPrice;
+    }
 }

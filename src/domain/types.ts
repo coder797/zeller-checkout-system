@@ -2,8 +2,8 @@ import {Cart} from "./cart";
 import {Catalog} from "./catalog";
 
 export interface PricingRule {
-    apply(cart: Cart, catalog: Catalog): number;
     getSku(): string;
+    apply(quantity: number, unitPrice: number, currentTotal: number): number;
 }
 
 export interface Product {

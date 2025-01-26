@@ -13,18 +13,10 @@ export class BuyXPayYRule implements PricingRule {
         return this.sku;
     }
 
-    apply(cart: Cart, catalog: Catalog): number {
-        const quantity = cart.getItemCount(this.sku);
-        const dealCount = Math.floor(quantity / this.buyX);
-        const product = catalog.getProduct(this.sku);
-        
-        if (!product) return 0;
-        
-        // Calculate free items based on the deal
-        const freeItems = dealCount * (this.buyX - this.payY);
-        
-        // Return the discount amount using current price
-        return freeItems * product.price;
+    apply(quantity: number, unitPrice: number, currentTotal: number): number {
+        const sets = Math.floor(quantity / this.buyX);
+        const remainder = quantity % this.buyX;
+        return (sets * this.payY + remainder) * unitPrice;
     }
 
     getBuyX(): number {
