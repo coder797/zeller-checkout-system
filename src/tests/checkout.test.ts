@@ -217,4 +217,40 @@ describe('Checkout', () => {
             assert.strictEqual(checkout.total(), 5 * 499.99);
         });
     });
+
+    describe('example Scenario Tests', () => {
+        it('scenario 1: handles 3 ATVs and 1 VGA adapter', () => {
+            const rules: PricingRule[] = [
+                new BuyXPayYRule('atv', 3, 2)
+            ];
+            const checkout = new Checkout(rules);
+
+            // Scan items
+            checkout.scan('atv');
+            checkout.scan('atv');
+            checkout.scan('atv');
+            checkout.scan('vga');
+
+            assert.strictEqual(checkout.total(), 249.00);
+        });
+
+        it('scenario 2: handles 2 ATVs and 5 iPads', () => {
+            const rules: PricingRule[] = [
+                new BuyXPayYRule('atv', 3, 2),
+                new BulkDiscountRule('ipd', 4, 499.99)
+            ];
+            const checkout = new Checkout(rules);
+
+            // Scan items in given order
+            checkout.scan('atv');
+            checkout.scan('ipd');
+            checkout.scan('ipd');
+            checkout.scan('atv');
+            checkout.scan('ipd');
+            checkout.scan('ipd');
+            checkout.scan('ipd');
+
+            assert.strictEqual(checkout.total(), 2718.95);
+        });
+    });
 });
