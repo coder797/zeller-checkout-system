@@ -1,3 +1,5 @@
+import {ProductNotFoundError} from "@/domain/types";
+
 export class Cart {
     private readonly items: Map<string, number>;
 
@@ -10,7 +12,7 @@ export class Cart {
      */
     addItem(sku: string): void {
         if (!sku) {
-            throw new Error('Invalid SKU');
+            throw new ProductNotFoundError(sku);
         }
         const existingQty = this.items.get(sku) || 0;
         this.items.set(sku, existingQty + 1);
